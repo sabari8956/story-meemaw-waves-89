@@ -1,23 +1,27 @@
 
-import HoverWarpText from './HoverWarpText';
 import ElectricButton from './ElectricButton';
 import NoiseBackground from './NoiseBackground';
+import ContourEffect from './ContourEffect';
 import { ArrowDown } from 'lucide-react';
 
 const HeroSection = () => {
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
-      {/* Noise background */}
+      {/* WebGL Contour Effect Background */}
+      <div className="absolute inset-0 z-0">
+        <ContourEffect />
+      </div>
+      
+      {/* Noise background overlay */}
       <NoiseBackground />
       
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
-        {/* Hover warp main heading */}
+        {/* Invisible text to maintain layout spacing - the actual text is rendered in WebGL */}
         <div className="mb-8 w-full max-w-6xl">
-          <HoverWarpText 
-            text="Story Meemaw"
-            className="h-64 md:h-48 lg:h-56"
-          />
+          <h1 className="font-orbitron font-black text-white tracking-tighter leading-none text-center text-mega lg:text-ultra md:text-massive sm:text-6xl select-none opacity-0">
+            STORY MEEMAW
+          </h1>
         </div>
         
         {/* Subtitle */}
@@ -38,17 +42,6 @@ const HeroSection = () => {
           />
         </div>
       </div>
-      
-      {/* Subtle geometric overlays */}
-      <div className="absolute top-20 left-10 w-32 h-32 border border-white opacity-5 rotate-45"></div>
-      <div className="absolute bottom-40 right-20 w-24 h-24 border border-white opacity-10 rounded-full"></div>
-      <div className="absolute top-1/2 left-0 w-1 h-40 bg-white opacity-5"></div>
-      <div className="absolute top-1/3 right-0 w-1 h-60 bg-white opacity-5"></div>
-      
-      {/* Floating particles */}
-      <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white rounded-full opacity-20 animate-pulse"></div>
-      <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-white rounded-full opacity-30 animate-pulse" style={{animationDelay: '1s'}}></div>
-      <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-white rounded-full opacity-25 animate-pulse" style={{animationDelay: '2s'}}></div>
     </div>
   );
 };
