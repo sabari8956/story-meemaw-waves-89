@@ -3,6 +3,37 @@
 ## Project info
 
 **URL**: https://lovable.dev/projects/03ecc104-e14e-465b-9493-71e0f52d1033
+**GitHub Pages**: https://yourdomain.com (replace with your custom domain)
+
+## GitHub Pages Deployment
+
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions with custom domain support.
+
+### Automatic Deployment
+1. Push to the `main` branch
+2. GitHub Actions will automatically build and deploy to GitHub Pages
+3. Your site will be available at your custom domain
+
+### Manual Deployment
+```bash
+npm install
+npm run deploy
+```
+
+### Setup Instructions for Custom Domain
+1. Update the `public/CNAME` file with your domain name
+2. Go to your GitHub repository settings
+3. Navigate to "Pages" in the left sidebar
+4. Under "Source", select "GitHub Actions"
+5. Under "Custom domain", enter your domain name
+6. Configure your domain's DNS to point to GitHub Pages:
+   - For apex domain (yourdomain.com): Create A records pointing to:
+     - 185.199.108.153
+     - 185.199.109.153
+     - 185.199.110.153
+     - 185.199.111.153
+   - For subdomain (www.yourdomain.com): Create CNAME record pointing to yourusername.github.io
+7. Push to main branch to trigger the first deployment
 
 ## How can I edit this code?
 
