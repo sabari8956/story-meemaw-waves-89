@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -21,6 +20,13 @@ export default {
 		extend: {
 			fontFamily: {
 				'poppins': ['Poppins', 'sans-serif'],
+				'orbitron': ['Orbitron', 'monospace'],
+				'exo': ['Exo 2', 'sans-serif'],
+			},
+			fontSize: {
+				'mega': ['12rem', { lineHeight: '0.8' }],
+				'ultra': ['8rem', { lineHeight: '0.8' }],
+				'massive': ['6rem', { lineHeight: '0.8' }],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
