@@ -21,81 +21,77 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
 
     glRef.current = gl;
 
-    // Vertex shader
+    // Vertex shader with mouse-based warping
     const vertexShaderSource = `
       attribute vec2 a_position;
       attribute vec2 a_texCoord;
       
       uniform vec2 u_resolution;
-      uniform float u_time;
       uniform vec2 u_mouse;
-      uniform sampler2D u_textTexture;
+      uniform sampler2D u_textMask;
+      uniform float u_time;
       
       varying vec2 v_texCoord;
-      varying float v_displacement;
+      varying float v_lineIntensity;
       
       void main() {
         v_texCoord = a_texCoord;
         
-        // Sample text displacement
-        vec4 textSample = texture2D(u_textTexture, a_texCoord);
-        float textMask = textSample.a;
-        
-        // Create displacement based on text
-        float displacement = textMask * 0.15;
-        
-        // Add mouse interaction
-        vec2 mousePos = u_mouse;
-        float mouseDist = distance(a_texCoord, mousePos);
-        float mouseEffect = smoothstep(0.3, 0.0, mouseDist) * 0.1;
-        
-        displacement += mouseEffect;
-        
-        // Add subtle wave animation
-        displacement += sin(a_texCoord.y * 20.0 + u_time * 2.0) * 0.02;
-        
-        v_displacement = displacement;
+        // Sample the text mask to see if we're inside text area
+        vec4 textSample = texture2D(u_textMask, a_texCoord);
+        float textMask = textSample.r; // Use red channel for mask
         
         vec2 position = a_position;
-        position.x += displacement;
+        
+        // Mouse-based warping
+        vec2 mousePos = u_mouse * 2.0 - 1.0; // Convert to [-1, 1]
+        float mouseDist = distance(position, mousePos);
+        float mouseWarp = smoothstep(0.3, 0.0, mouseDist) * 0.15 * sin(u_time * 3.0 + mouseDist * 10.0);
+        
+        // Text-based line bending - only bend lines where text is present
+        float textWarp = textMask * 0.2 * sin(a_texCoord.x * 15.0 + u_time * 2.0);
+        
+        // Apply warping to X position
+        position.x += mouseWarp + textWarp;
+        
+        // Set line intensity based on text mask and mouse proximity
+        v_lineIntensity = 0.3 + textMask * 0.7 + smoothstep(0.4, 0.0, mouseDist) * 0.3;
         
         gl_Position = vec4(position, 0.0, 1.0);
       }
     `;
 
-    // Fragment shader
+    // Fragment shader for line rendering
     const fragmentShaderSource = `
       precision mediump float;
       
-      uniform vec2 u_resolution;
       varying vec2 v_texCoord;
-      varying float v_displacement;
+      varying float v_lineIntensity;
       
       void main() {
         // Create horizontal lines
-        float lineSpacing = 0.03;
-        float lineWidth = 0.002;
+        float lineSpacing = 0.025;
+        float lineWidth = 0.003;
         
         float line = mod(v_texCoord.y, lineSpacing);
-        float lineIntensity = smoothstep(lineWidth, 0.0, abs(line - lineSpacing * 0.5));
+        float lineAlpha = smoothstep(lineWidth, 0.0, abs(line - lineSpacing * 0.5));
         
-        // Add displacement-based intensity variation
-        lineIntensity *= (1.0 + v_displacement * 2.0);
-        lineIntensity = clamp(lineIntensity, 0.0, 1.0);
+        // Apply intensity variation
+        lineAlpha *= v_lineIntensity;
         
         // Fade edges
-        float edgeFade = smoothstep(0.0, 0.1, v_texCoord.x) * 
-                        smoothstep(1.0, 0.9, v_texCoord.x) *
-                        smoothstep(0.0, 0.1, v_texCoord.y) * 
-                        smoothstep(1.0, 0.9, v_texCoord.y);
+        float edgeFade = smoothstep(0.0, 0.05, v_texCoord.x) * 
+                        smoothstep(1.0, 0.95, v_texCoord.x) *
+                        smoothstep(0.0, 0.05, v_texCoord.y) * 
+                        smoothstep(1.0, 0.95, v_texCoord.y);
         
-        lineIntensity *= edgeFade;
+        lineAlpha *= edgeFade;
         
-        gl_FragColor = vec4(lineIntensity, lineIntensity, lineIntensity, 1.0);
+        gl_FragColor = vec4(lineAlpha, lineAlpha, lineAlpha, 1.0);
       }
     `;
 
-    // Compile shader
+    // Compile shader helper
     const compileShader = (source: string, type: number) => {
       const shader = gl.createShader(type);
       if (!shader) return null;
@@ -117,7 +113,7 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
 
     if (!vertexShader || !fragmentShader) return;
 
-    // Create program
+    // Create and link program
     const program = gl.createProgram();
     if (!program) return;
 
@@ -132,8 +128,8 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
 
     programRef.current = program;
 
-    // Create geometry for grid
-    const createGrid = (cols: number, rows: number) => {
+    // Create dense grid for smooth line deformation
+    const createLineGrid = (cols: number, rows: number) => {
       const positions = [];
       const texCoords = [];
       const indices = [];
@@ -163,7 +159,7 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
       return { positions, texCoords, indices };
     };
 
-    const { positions, texCoords, indices } = createGrid(200, 150);
+    const { positions, texCoords, indices } = createLineGrid(150, 100);
 
     // Create buffers
     const positionBuffer = gl.createBuffer();
@@ -178,25 +174,28 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
-    // Create text texture
-    const createTextTexture = () => {
-      const textCanvas = document.createElement('canvas');
-      textCanvas.width = 1024;
-      textCanvas.height = 512;
-      const ctx = textCanvas.getContext('2d')!;
+    // Create text mask texture
+    const createTextMask = () => {
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = 512;
+      maskCanvas.height = 256;
+      const ctx = maskCanvas.getContext('2d')!;
 
+      // Clear to black
       ctx.fillStyle = 'black';
-      ctx.fillRect(0, 0, textCanvas.width, textCanvas.height);
+      ctx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
 
+      // Draw text in white
       ctx.fillStyle = 'white';
-      ctx.font = 'bold 120px Orbitron, monospace';
+      ctx.font = 'bold 60px Orbitron, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('STORY MEEMAW', textCanvas.width / 2, textCanvas.height / 2);
+      ctx.fillText('STORY MEEMAW', maskCanvas.width / 2, maskCanvas.height / 2);
 
+      // Create WebGL texture
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textCanvas);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, maskCanvas);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -205,17 +204,17 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
       return texture;
     };
 
-    const textTexture = createTextTexture();
+    const textMask = createTextMask();
 
-    // Get attribute and uniform locations
+    // Get uniform and attribute locations
     const positionLocation = gl.getAttribLocation(program, 'a_position');
     const texCoordLocation = gl.getAttribLocation(program, 'a_texCoord');
     const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-    const timeLocation = gl.getUniformLocation(program, 'u_time');
     const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
-    const textTextureLocation = gl.getUniformLocation(program, 'u_textTexture');
+    const textMaskLocation = gl.getUniformLocation(program, 'u_textMask');
+    const timeLocation = gl.getUniformLocation(program, 'u_time');
 
-    // Resize function
+    // Resize handler
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
       const displayWidth = canvas.clientWidth * dpr;
@@ -245,6 +244,10 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
+      // Enable blending for smooth lines
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
       // Bind position buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.enableVertexAttribArray(positionLocation);
@@ -260,13 +263,13 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
 
       // Set uniforms
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-      gl.uniform1f(timeLocation, time * 0.001);
       gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y);
+      gl.uniform1f(timeLocation, time * 0.001);
 
-      // Bind text texture
+      // Bind text mask texture
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, textTexture);
-      gl.uniform1i(textTextureLocation, 0);
+      gl.bindTexture(gl.TEXTURE_2D, textMask);
+      gl.uniform1i(textMaskLocation, 0);
 
       // Draw
       gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
@@ -277,7 +280,7 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
     resize();
     render(0);
 
-    // Handle resize
+    // Event listeners
     window.addEventListener('resize', resize);
 
     return () => {
@@ -293,7 +296,7 @@ const ContourEffect = ({ className = '' }: ContourEffectProps) => {
       }
       if (vertexShader) gl.deleteShader(vertexShader);
       if (fragmentShader) gl.deleteShader(fragmentShader);
-      if (textTexture) gl.deleteTexture(textTexture);
+      if (textMask) gl.deleteTexture(textMask);
       if (positionBuffer) gl.deleteBuffer(positionBuffer);
       if (texCoordBuffer) gl.deleteBuffer(texCoordBuffer);
       if (indexBuffer) gl.deleteBuffer(indexBuffer);
