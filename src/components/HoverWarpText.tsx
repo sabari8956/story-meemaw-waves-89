@@ -28,8 +28,10 @@ const HoverWarpText = ({ text, className = '' }: HoverWarpTextProps) => {
   }, []);
 
   const generateLines = () => {
+    if (!isHovered) return null;
+    
     const lines = [];
-    const lineCount = 40;
+    const lineCount = 30;
     const containerWidth = 100;
     const containerHeight = 100;
     
@@ -37,35 +39,28 @@ const HoverWarpText = ({ text, className = '' }: HoverWarpTextProps) => {
       const y = (i / (lineCount - 1)) * containerHeight;
       let path = `M 0 ${y}`;
       
-      if (isHovered) {
-        // Create wave distortion based on mouse position
-        const segments = 20;
-        for (let j = 1; j <= segments; j++) {
-          const x = (j / segments) * containerWidth;
-          const distanceFromMouse = Math.sqrt(
-            Math.pow(x - (mousePosition.x / containerRef.current!.offsetWidth) * 100, 2) +
-            Math.pow(y - (mousePosition.y / containerRef.current!.offsetHeight) * 100, 2)
-          );
-          
-          const warpIntensity = Math.max(0, 8 - distanceFromMouse * 0.3);
-          const warpY = y + Math.sin(x * 0.2 + Date.now() * 0.01) * warpIntensity;
-          
-          path += ` L ${x} ${warpY}`;
-        }
-      } else {
-        path += ` L ${containerWidth} ${y}`;
+      // Create wave distortion based on mouse position
+      const segments = 20;
+      for (let j = 1; j <= segments; j++) {
+        const x = (j / segments) * containerWidth;
+        const distanceFromMouse = Math.sqrt(
+          Math.pow(x - (mousePosition.x / containerRef.current!.offsetWidth) * 100, 2) +
+          Math.pow(y - (mousePosition.y / containerRef.current!.offsetHeight) * 100, 2)
+        );
+        
+        const warpIntensity = Math.max(0, 8 - distanceFromMouse * 0.3);
+        const warpY = y + Math.sin(x * 0.2 + Date.now() * 0.01) * warpIntensity;
+        
+        path += ` L ${x} ${warpY}`;
       }
       
       lines.push(
         <path
           key={i}
           d={path}
-          stroke="rgba(255,255,255,0.1)"
+          stroke="rgba(255,255,255,0.2)"
           strokeWidth="0.5"
           fill="none"
-          style={{
-            transition: isHovered ? 'none' : 'all 0.3s ease-out'
-          }}
         />
       );
     }
@@ -79,14 +74,16 @@ const HoverWarpText = ({ text, className = '' }: HoverWarpTextProps) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background lines */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        {generateLines()}
-      </svg>
+      {/* Background lines - only visible on hover */}
+      {isHovered && (
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          {generateLines()}
+        </svg>
+      )}
       
       {/* Text */}
       <h1 className="relative z-10 font-orbitron font-black text-white tracking-tighter leading-none text-center text-mega lg:text-ultra md:text-massive sm:text-6xl select-none">

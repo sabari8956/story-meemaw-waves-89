@@ -1,27 +1,23 @@
 
 import ElectricButton from './ElectricButton';
 import NoiseBackground from './NoiseBackground';
-import ContourEffect from './ContourEffect';
+import HoverWarpText from './HoverWarpText';
 import { ArrowDown } from 'lucide-react';
 
 const HeroSection = () => {
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
-      {/* WebGL Contour Effect Background */}
-      <div className="absolute inset-0 z-0">
-        <ContourEffect />
-      </div>
-      
       {/* Noise background overlay */}
       <NoiseBackground />
       
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
-        {/* Invisible text to maintain layout spacing - the actual text is rendered in WebGL */}
+        {/* Main title with hover effect */}
         <div className="mb-8 w-full max-w-6xl">
-          <h1 className="font-orbitron font-black text-white tracking-tighter leading-none text-center text-mega lg:text-ultra md:text-massive sm:text-6xl select-none opacity-0">
-            STORY MEEMAW
-          </h1>
+          <HoverWarpText 
+            text="STORY MEEMAW"
+            className="mb-8"
+          />
         </div>
         
         {/* Subtitle */}
