@@ -2,6 +2,7 @@
 import ElectricButton from './ElectricButton';
 import NoiseBackground from './NoiseBackground';
 import HoverWarpText from './HoverWarpText';
+import CursorEffect from './CursorEffect';
 import { ArrowDown } from 'lucide-react';
 
 const HeroSection = () => {
@@ -9,6 +10,9 @@ const HeroSection = () => {
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Noise background overlay */}
       <NoiseBackground />
+      
+      {/* Cursor effect */}
+      <CursorEffect />
       
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">

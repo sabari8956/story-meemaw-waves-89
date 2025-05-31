@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 
 interface ElectricButtonProps {
@@ -28,7 +27,7 @@ const ElectricButton = ({ children, onClick }: ElectricButtonProps) => {
     };
 
     const animate = () => {
-      time += 0.02;
+      time += 0.01; // Slowed down from 0.02
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Electric border effect
@@ -40,7 +39,7 @@ const ElectricButton = ({ children, onClick }: ElectricButtonProps) => {
         const segments = 20;
         for (let i = 0; i <= segments; i++) {
           const x = (i / segments) * canvas.width;
-          const jitter = Math.sin(time * 3 + i * 0.5) * 2;
+          const jitter = Math.sin(time * 2 + i * 0.5) * 2; // Slowed down from time * 3
           
           if (i === 0) {
             ctx.moveTo(x, 0 + jitter);
@@ -51,19 +50,19 @@ const ElectricButton = ({ children, onClick }: ElectricButtonProps) => {
         
         for (let i = 0; i <= segments; i++) {
           const y = (i / segments) * canvas.height;
-          const jitter = Math.cos(time * 3 + i * 0.5) * 2;
+          const jitter = Math.cos(time * 2 + i * 0.5) * 2; // Slowed down from time * 3
           ctx.lineTo(canvas.width + jitter, y);
         }
         
         for (let i = segments; i >= 0; i--) {
           const x = (i / segments) * canvas.width;
-          const jitter = Math.sin(time * 3 + i * 0.5) * 2;
+          const jitter = Math.sin(time * 2 + i * 0.5) * 2; // Slowed down from time * 3
           ctx.lineTo(x, canvas.height + jitter);
         }
         
         for (let i = segments; i >= 0; i--) {
           const y = (i / segments) * canvas.height;
-          const jitter = Math.cos(time * 3 + i * 0.5) * 2;
+          const jitter = Math.cos(time * 2 + i * 0.5) * 2; // Slowed down from time * 3
           ctx.lineTo(0 + jitter, y);
         }
         
@@ -151,7 +150,7 @@ const ElectricButton = ({ children, onClick }: ElectricButtonProps) => {
   return (
     <button
       ref={buttonRef}
-      className="group relative font-exo font-medium text-sm uppercase tracking-wider px-8 py-3 bg-transparent text-white transition-all duration-300 hover:bg-white hover:text-black overflow-hidden"
+      className="group relative font-exo font-medium text-sm uppercase tracking-wider px-8 py-3 bg-transparent text-white transition-all duration-500 hover:bg-white hover:text-black overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onMouseMove={handleMouseMove}
