@@ -3,7 +3,6 @@ import ElectricButton from './ElectricButton';
 import NoiseBackground from './NoiseBackground';
 import HoverWarpText from './HoverWarpText';
 import CursorEffect from './CursorEffect';
-import { ArrowDown } from 'lucide-react';
 
 const HeroSection = () => {
   return (
@@ -17,7 +16,7 @@ const HeroSection = () => {
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Main title with hover effect */}
-        <div className="mb-8 w-full max-w-6xl">
+        <div className="mb-8 w-full max-w-7xl px-2 sm:px-4">
           <HoverWarpText 
             text="STORY MEEMAW"
             className="mb-8"
@@ -30,17 +29,9 @@ const HeroSection = () => {
         </p>
         
         {/* Electric CTA Button */}
-        <ElectricButton onClick={() => console.log('Get Started clicked!')}>
-          Get Started
+        <ElectricButton onClick={() => console.log('Under Construction clicked!')}>
+          Under Construction
         </ElectricButton>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <ArrowDown 
-            className="w-6 h-6 text-white animate-pulse-glow" 
-            strokeWidth={1}
-          />
-        </div>
       </div>
     </div>
   );

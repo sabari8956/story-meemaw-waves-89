@@ -27,6 +27,8 @@ export default {
 				'mega': ['12rem', { lineHeight: '0.8' }],
 				'ultra': ['8rem', { lineHeight: '0.8' }],
 				'massive': ['6rem', { lineHeight: '0.8' }],
+				'huge': ['4rem', { lineHeight: '0.8' }],
+				'big': ['3rem', { lineHeight: '0.8' }],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

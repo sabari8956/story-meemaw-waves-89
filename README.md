@@ -1,9 +1,10 @@
-# Welcome to your Lovable project
+# Story Meemaw
 
-## Project info
+AI-Powered Stories for Little Ones
 
-**URL**: https://lovable.dev/projects/03ecc104-e14e-465b-9493-71e0f52d1033
-**GitHub Pages**: https://yourdomain.com (replace with your custom domain)
+## Project Overview
+
+Story Meemaw creates magical AI-powered stories for children ages 0-5. This web application features an interactive interface with beautiful animations and effects.
 
 ## GitHub Pages Deployment
 
@@ -35,37 +36,31 @@ npm run deploy
    - For subdomain (www.yourdomain.com): Create CNAME record pointing to yourusername.github.io
 7. Push to main branch to trigger the first deployment
 
-## How can I edit this code?
+## Development
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/03ecc104-e14e-465b-9493-71e0f52d1033) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+### Getting Started
+
+Follow these steps to set up the development environment:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Step 2: Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Step 3: Install the necessary dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server with auto-reloading and an instant preview
 npm run dev
 ```
+
+### Alternative Development Methods
 
 **Edit a file directly in GitHub**
 
@@ -81,24 +76,27 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technologies
 
-This project is built with:
+This project is built with modern web technologies:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Fast build tool and development server
+- **TypeScript** - Type-safe JavaScript
+- **React** - UI library
+- **shadcn-ui** - Modern component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Three.js** - 3D graphics and animations
+- **Lucide React** - Beautiful icons
 
-## How can I deploy this project?
+## Features
 
-Simply open [Lovable](https://lovable.dev/projects/03ecc104-e14e-465b-9493-71e0f52d1033) and click on Share -> Publish.
+- Interactive hero section with animated text effects
+- Electric button animations
+- Noise background effects
+- Custom cursor interactions
+- Responsive design
+- Modern UI components
 
-## Can I connect a custom domain to my Lovable project?
+## Deployment
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+The project includes automated deployment to GitHub Pages. Simply push to the main branch and GitHub Actions will handle the build and deployment process.
